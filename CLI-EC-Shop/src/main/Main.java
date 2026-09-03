@@ -73,7 +73,7 @@ public class Main {
 		Menu.showProductSearchPrompt();
 
 		String searchProductName = scanner.next();
-
+		//	入力された商品名から商品を取得し、詳細を表示する	
 		if (searchProductName.equals("0")) {
 			return;
 		}

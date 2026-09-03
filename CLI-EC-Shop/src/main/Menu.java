@@ -26,6 +26,7 @@ public class Menu {
 	}
 
 	public static void showProductSelectionPrompt() {
+		System.out.println();
 		System.out.println("確認したい商品IDを入力してください");
 		System.out.println("商品メニューに戻る場合は、0 を入力してください。");
 		System.out.println("--------------------");
@@ -40,6 +41,7 @@ public class Menu {
 	}
 
 	public static void showProductSearchPrompt() {
+		System.out.println();
 		System.out.println("検索したい商品名を入力してください。");
 		System.out.println("商品メニューに戻る場合は、0 を入力してください。");
 		System.out.println("--------------------");
