@@ -1,7 +1,9 @@
 package main;
 
+import java.util.List;
 import java.util.Scanner;
 
+import model.Product;
 import service.ProductService;
 
 public class Main {
@@ -54,7 +56,7 @@ public class Main {
 		}
 	}
 
-	// 商品一覧を表示し、詳細を確認する商品IDを受け取る
+	// 商品一覧を表示し、詳細を確認する
 	private static void runProductList(Scanner scanner, ProductService productService) {
 		productService.showProductList();
 		Menu.showProductSelectionPrompt();
@@ -66,20 +68,72 @@ public class Main {
 			return;
 		}
 
+		Product selectedProduct = productService.findProductById(selectedProductId);
+
+		if (selectedProduct == null) {
+			System.out.println();
+			System.out.println("商品が見つかりません");
+			System.out.println();
+			return;
+		}
+
+		productService.showProductDetail(selectedProduct);
 	}
 
 	// 商品名を受け取り、該当する商品を検索する
 	private static void runProductSearch(Scanner scanner, ProductService productService) {
+		//検索プロンプトの表示		
 		Menu.showProductSearchPrompt();
+		//検索キー		
+		String keyword = scanner.next();
 
-		String searchProductName = scanner.next();
-		//	入力された商品名から商品を取得し、詳細を表示する	
-		if (searchProductName.equals("0")) {
+		//検索処理		
+		if (keyword.equals("0")) {
 			return;
 		}
 
-		// 商品名から検索する処理
-		// 検索結果を表示する処理
+		List<Product> searchResults = productService.searchProductsByName(keyword);
+
+		if (searchResults.isEmpty()) {
+			System.out.println("======検索結果=======");
+			System.out.println("該当する商品がありません");
+			return;
+		}
+		System.out.println("======検索結果=======");
+		System.out.println(searchResults.size() + "件の商品");
+		System.out.println();
+		System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
+		System.out.println();
+		for (Product currentProduct : searchResults) {
+			System.out.printf("%-4s %-18s %-12s %-8s%n",
+					currentProduct.getProductId(),
+					currentProduct.getProductName(),
+					currentProduct.getPrice(),
+					currentProduct.getStock());
+		}
+		System.out.println();
+		// 商品IDを入力させ、商品詳細を表示させる				
+		Menu.showProductSelectionPrompt();
+		int selectedProductId = scanner.nextInt();
+		System.out.println();
+		// 入力された商品IDから商品を取得し、詳細を表示する
+		if (selectedProductId == 0) {
+			return;
+		}
+
+		Product selectedProduct = productService.findProductById(selectedProductId);
+
+		if (selectedProduct == null) {
+			System.out.println();
+			System.out.println("商品が見つかりません");
+			System.out.println();
+			return;
+		}
+
+		productService.showProductDetail(selectedProduct);
+
+		Menu.showProductDetailMenu();
+
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
