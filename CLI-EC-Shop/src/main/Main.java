@@ -56,6 +56,27 @@ public class Main {
 		}
 	}
 
+	private static void runProductDetail(Scanner scanner, ProductService productService, Product selectedProduct) {
+		//商品詳細を表示
+		productService.showProductDetail(selectedProduct);
+
+		//商品詳細メニューの繰り返し表示
+		while (true) {
+			Menu.showProductDetailMenu();
+			int detailMenuNum = scanner.nextInt();
+
+			if (detailMenuNum == 1) {
+				//カート追加処理					
+
+			} else if (detailMenuNum == 0) {
+				//商品メニューへ				
+				return;
+			} else {
+				System.out.println("0~1の操作番号を入力してください。");
+			}
+		}
+	}
+
 	// 商品一覧を表示し、詳細を確認する
 	private static void runProductList(Scanner scanner, ProductService productService) {
 		productService.showProductList();
@@ -77,7 +98,7 @@ public class Main {
 			return;
 		}
 
-		productService.showProductDetail(selectedProduct);
+		runProductDetail(scanner, productService, selectedProduct);
 	}
 
 	// 商品名を受け取り、該当する商品を検索する
@@ -130,10 +151,7 @@ public class Main {
 			return;
 		}
 
-		productService.showProductDetail(selectedProduct);
-
-		Menu.showProductDetailMenu();
-
+		runProductDetail(scanner, productService, selectedProduct);
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
