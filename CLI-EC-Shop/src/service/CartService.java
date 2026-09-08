@@ -14,6 +14,23 @@ public class CartService {
 
 	// カート追加処理	
 	public boolean addToCart(Product product, int quantity) {
+		//カート内に追加商品があるか確認＋ある場合の追加（すでに追加済＋今回追加分）
+		for (CartItem currentCartItem : cart.getItems()) {
+			if (currentCartItem.getProduct().getProductId() == product.getProductId()) {
+				// 現在の数量と追加数量を合算
+				int updatedQuantity = currentCartItem.getQuantity() + quantity;
+
+				// 合算した数量が在庫数を超える場合
+				if (updatedQuantity > product.getStock()) {
+					return false;
+				}
+
+				// 既存のCartItemの数量を更新
+				currentCartItem.setQuantity(updatedQuantity);
+
+				return true;
+			}
+		}
 
 		//在庫数確認		
 		if (quantity > product.getStock()) {
@@ -26,6 +43,7 @@ public class CartService {
 		cart.getItems().add(newCartItem);
 
 		return true;
+
 	}
 
 	//カート内合計金額計算処理

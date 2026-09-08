@@ -176,6 +176,8 @@ public class Main {
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
 	private static void runCartMenu(Scanner scanner, CartService cartService) {
 		while (true) {
+			cartService.showCartList();
+			System.out.println();
 			Menu.showCartMenu();
 			int cartMenuNumber = scanner.nextInt();
 
