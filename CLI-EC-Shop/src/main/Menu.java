@@ -48,6 +48,12 @@ public class Menu {
 		System.out.print("商品名：");
 	}
 
+	public static void showAddToCartPrompt() {
+		System.out.println("購入数を入力してください");
+		System.out.println("--------------------");
+		System.out.print("購入数：");
+	}
+
 	public static void showCartMenu() {
 		System.out.println("====================");
 		System.out.println("　　　カートメニュー　　");

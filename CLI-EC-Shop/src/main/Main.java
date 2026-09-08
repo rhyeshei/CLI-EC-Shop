@@ -4,28 +4,30 @@ import java.util.List;
 import java.util.Scanner;
 
 import model.Product;
+import service.CartService;
 import service.ProductService;
 
 public class Main {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		ProductService productService = new ProductService();
+		CartService cartService = new CartService();
 
-		runMainMenu(scanner, productService);
+		runMainMenu(scanner, productService, cartService);
 
 		scanner.close();
 	}
 
 	// メインメニューを繰り返し表示し、選択された画面へ遷移する	
-	private static void runMainMenu(Scanner scanner, ProductService productService) {
+	private static void runMainMenu(Scanner scanner, ProductService productService, CartService cartService) {
 		while (true) {
 			Menu.showMainMenu();
 			int mainMenuNumber = scanner.nextInt();
 
 			if (mainMenuNumber == 1) {
-				runProductMenu(scanner, productService);
+				runProductMenu(scanner, productService, cartService);
 			} else if (mainMenuNumber == 2) {
-				runCartMenu(scanner);
+				runCartMenu(scanner, cartService);
 			} else if (mainMenuNumber == 0) {
 				System.out.println("CLI EC Shopを終了します。");
 				return;
@@ -38,15 +40,15 @@ public class Main {
 	}
 
 	// 商品メニューを繰り返し表示し、一覧または検索処理へ遷移する
-	private static void runProductMenu(Scanner scanner, ProductService productService) {
+	private static void runProductMenu(Scanner scanner, ProductService productService, CartService cartService) {
 		while (true) {
 			Menu.showProductMenu();
 			int productMenuNumber = scanner.nextInt();
 
 			if (productMenuNumber == 1) {
-				runProductList(scanner, productService);
+				runProductList(scanner, productService, cartService);
 			} else if (productMenuNumber == 2) {
-				runProductSearch(scanner, productService);
+				runProductSearch(scanner, productService, cartService);
 			} else if (productMenuNumber == 0) {
 				return;
 			} else {
@@ -56,7 +58,8 @@ public class Main {
 		}
 	}
 
-	private static void runProductDetail(Scanner scanner, ProductService productService, Product selectedProduct) {
+	private static void runProductDetail(Scanner scanner, ProductService productService, Product selectedProduct,
+			CartService cartService) {
 		//商品詳細を表示
 		productService.showProductDetail(selectedProduct);
 
@@ -66,19 +69,35 @@ public class Main {
 			int detailMenuNum = scanner.nextInt();
 
 			if (detailMenuNum == 1) {
-				//カート追加処理					
+				//購入数量を入力する処理				
+				while (true) {
+					Menu.showAddToCartPrompt();
+					int quantity = scanner.nextInt();
+
+					boolean isAdded = cartService.addToCart(selectedProduct, quantity);
+
+					if (!isAdded) {
+						System.out.println("在庫数が足りません。購入数を再度入力してください。");
+						System.out.println();
+					} else {
+						System.out.println("カートに" + selectedProduct.getProductName() + "を" + quantity + "個追加しました。");
+						System.out.println();
+						break;
+					}
+				}
 
 			} else if (detailMenuNum == 0) {
 				//商品メニューへ				
 				return;
 			} else {
-				System.out.println("0~1の操作番号を入力してください。");
+				System.out.println("0〜1の操作番号を入力してください。");
 			}
 		}
+
 	}
 
 	// 商品一覧を表示し、詳細を確認する
-	private static void runProductList(Scanner scanner, ProductService productService) {
+	private static void runProductList(Scanner scanner, ProductService productService, CartService cartService) {
 		productService.showProductList();
 		Menu.showProductSelectionPrompt();
 
@@ -98,11 +117,11 @@ public class Main {
 			return;
 		}
 
-		runProductDetail(scanner, productService, selectedProduct);
+		runProductDetail(scanner, productService, selectedProduct, cartService);
 	}
 
 	// 商品名を受け取り、該当する商品を検索する
-	private static void runProductSearch(Scanner scanner, ProductService productService) {
+	private static void runProductSearch(Scanner scanner, ProductService productService, CartService cartService) {
 		//検索プロンプトの表示		
 		Menu.showProductSearchPrompt();
 		//検索キー		
@@ -151,11 +170,11 @@ public class Main {
 			return;
 		}
 
-		runProductDetail(scanner, productService, selectedProduct);
+		runProductDetail(scanner, productService, selectedProduct, cartService);
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
-	private static void runCartMenu(Scanner scanner) {
+	private static void runCartMenu(Scanner scanner, CartService cartService) {
 		while (true) {
 			Menu.showCartMenu();
 			int cartMenuNumber = scanner.nextInt();

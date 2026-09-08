@@ -12,11 +12,19 @@ public class CartService {
 		return cart;
 	}
 
-	public void addToCart(Product product, int quantity) {
+	public boolean addToCart(Product product, int quantity) {
+
+		//在庫数確認		
+		if (quantity > product.getStock()) {
+			return false;
+		}
+
 		//商品と数量からカート内商品を作成
 		CartItem newCartItem = new CartItem(product, quantity);
-
+		//カートへ追加		
 		cart.getItems().add(newCartItem);
+
+		return true;
 	}
 
 }
