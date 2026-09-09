@@ -81,4 +81,25 @@ public class CartService {
 		System.out.println();
 	}
 
+	//商品IDからカート内の商品検索	
+	public CartItem findCartItemByProductId(int productId) {
+		for (CartItem currentCartItem : cart.getItems()) {
+			if (currentCartItem.getProduct().getProductId() == productId) {
+				return currentCartItem;
+			}
+		}
+		return null;
+	}
+
+	//数量変更メソッド
+	public boolean updateCartItemQuantity(CartItem cartItem, int newQuantity) {
+		if (newQuantity > cartItem.getProduct().getStock()) {
+			return false;
+		}
+
+		cartItem.setQuantity(newQuantity);
+
+		return true;
+	}
+
 }

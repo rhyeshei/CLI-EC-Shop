@@ -55,10 +55,6 @@ public class Menu {
 	}
 
 	public static void showCartMenu() {
-		System.out.println("====================");
-		System.out.println("　　　カートメニュー　　");
-		System.out.println("====================");
-		System.out.println();
 		System.out.println("1. 数量変更");
 		System.out.println("2. 商品削除");
 		System.out.println("3. 注文");
@@ -77,6 +73,19 @@ public class Menu {
 		System.out.println("0. カートメニューに戻る");
 		System.out.println("--------------------");
 		System.out.print("操作番号を入力してください：");
+	}
+
+	public static void showCartQuantityUpdatePrompt() {
+		System.out.println();
+		System.out.println("変更する商品IDを入力してください");
+		System.out.println("カートメニューに戻る場合は、0を入力してください。");
+		System.out.println("--------------------");
+		System.out.print("商品ID：");
+	}
+
+	public static void showNewQuantityPrompt() {
+		System.out.println("変更後の数量を入力してください。");
+		System.out.print("数量：");
 	}
 
 }

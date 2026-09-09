@@ -3,6 +3,7 @@ package main;
 import java.util.List;
 import java.util.Scanner;
 
+import model.CartItem;
 import model.Product;
 import service.CartService;
 import service.ProductService;
@@ -177,12 +178,12 @@ public class Main {
 	private static void runCartMenu(Scanner scanner, CartService cartService) {
 		while (true) {
 			cartService.showCartList();
-			System.out.println();
 			Menu.showCartMenu();
 			int cartMenuNumber = scanner.nextInt();
 
 			if (cartMenuNumber == 1) {
 				//数量変更処理
+				runCartQuantityUpdate(scanner, cartService);
 			} else if (cartMenuNumber == 2) {
 				//商品削除処理
 			} else if (cartMenuNumber == 3) {
@@ -197,4 +198,41 @@ public class Main {
 
 	}
 
+	private static void runCartQuantityUpdate(Scanner scanner, CartService cartService) {
+		Menu.showCartQuantityUpdatePrompt();
+		int selectedProductId = scanner.nextInt();
+
+		//カートメニューへ戻る
+		if (selectedProductId == 0) {
+			return;
+		}
+
+		//入力された商品IDからカート内商品を取得		
+		CartItem selectedCartItem = cartService.findCartItemByProductId(selectedProductId);
+
+		if (selectedCartItem == null) {
+			System.out.println("カート内に該当する商品がありません");
+			System.out.println();
+			return;
+		}
+
+		while (true) {
+			Menu.showNewQuantityPrompt();
+			int updateQuantity = scanner.nextInt();
+
+			boolean isUpdate = cartService.updateCartItemQuantity(selectedCartItem, updateQuantity);
+
+			if (isUpdate == true) {
+				System.out.println("数量を変更しました。");
+				System.out.println();
+				return;
+			}
+			System.out.println();
+			System.out.println("在庫数が足りません。再度数量を入力してください。");
+			System.out.println("在庫数：" + selectedCartItem.getProduct().getStock());
+			System.out.println();
+
+		}
+
+	}
 }
