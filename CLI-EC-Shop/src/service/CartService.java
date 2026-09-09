@@ -102,4 +102,17 @@ public class CartService {
 		return true;
 	}
 
+	//商品削除メソッド	
+	public boolean removeCartItemByProductId(int productId) {
+		CartItem deleteItem = findCartItemByProductId(productId);
+
+		if (deleteItem == null) {
+			return false;
+		}
+
+		cart.getItems().remove(deleteItem);
+
+		return true;
+	}
+
 }

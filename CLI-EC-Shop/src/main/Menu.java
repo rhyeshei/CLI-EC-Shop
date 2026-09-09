@@ -88,4 +88,11 @@ public class Menu {
 		System.out.print("数量：");
 	}
 
+	public static void showCartItemDeletePrompt() {
+		System.out.println("削除する商品IDを入力してください。");
+		System.out.println("カートメニューに戻る場合は、0を入力してください。");
+		System.out.print("商品ID：");
+
+	}
+
 }

@@ -186,6 +186,7 @@ public class Main {
 				runCartQuantityUpdate(scanner, cartService);
 			} else if (cartMenuNumber == 2) {
 				//商品削除処理
+				runCartItemDelete(scanner, cartService);
 			} else if (cartMenuNumber == 3) {
 				//注文処理
 			} else if (cartMenuNumber == 0) {
@@ -234,5 +235,25 @@ public class Main {
 
 		}
 
+	}
+
+	private static void runCartItemDelete(Scanner scanner, CartService cartService) {
+		Menu.showCartItemDeletePrompt();
+		int selectedProductId = scanner.nextInt();
+
+		if (selectedProductId == 0) {
+			return;
+		}
+
+		boolean isDeleted = cartService.removeCartItemByProductId(selectedProductId);
+
+		if (isDeleted == false) {
+			System.out.println("カート内に該当する商品がありません");
+			System.out.println();
+			return;
+		}
+
+		System.out.println("商品をカートから削除しました。");
+		System.out.println();
 	}
 }
