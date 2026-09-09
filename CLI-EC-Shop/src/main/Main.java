@@ -3,9 +3,12 @@ package main;
 import java.util.List;
 import java.util.Scanner;
 
+import model.Cart;
 import model.CartItem;
+import model.Order;
 import model.Product;
 import service.CartService;
+import service.OrderService;
 import service.ProductService;
 
 public class Main {
@@ -13,14 +16,16 @@ public class Main {
 		Scanner scanner = new Scanner(System.in);
 		ProductService productService = new ProductService();
 		CartService cartService = new CartService();
+		OrderService orderService = new OrderService();
 
-		runMainMenu(scanner, productService, cartService);
+		runMainMenu(scanner, productService, cartService, orderService);
 
 		scanner.close();
 	}
 
 	// メインメニューを繰り返し表示し、選択された画面へ遷移する	
-	private static void runMainMenu(Scanner scanner, ProductService productService, CartService cartService) {
+	private static void runMainMenu(Scanner scanner, ProductService productService, CartService cartService,
+			OrderService orderService) {
 		while (true) {
 			Menu.showMainMenu();
 			int mainMenuNumber = scanner.nextInt();
@@ -28,7 +33,7 @@ public class Main {
 			if (mainMenuNumber == 1) {
 				runProductMenu(scanner, productService, cartService);
 			} else if (mainMenuNumber == 2) {
-				runCartMenu(scanner, cartService);
+				runCartMenu(scanner, cartService, orderService);
 			} else if (mainMenuNumber == 0) {
 				System.out.println("CLI EC Shopを終了します。");
 				return;
@@ -83,7 +88,7 @@ public class Main {
 					} else {
 						System.out.println("カートに" + selectedProduct.getProductName() + "を" + quantity + "個追加しました。");
 						System.out.println();
-						break;
+						return;
 					}
 				}
 
@@ -175,7 +180,7 @@ public class Main {
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
-	private static void runCartMenu(Scanner scanner, CartService cartService) {
+	private static void runCartMenu(Scanner scanner, CartService cartService, OrderService orderService) {
 		while (true) {
 			cartService.showCartList();
 			Menu.showCartMenu();
@@ -189,6 +194,11 @@ public class Main {
 				runCartItemDelete(scanner, cartService);
 			} else if (cartMenuNumber == 3) {
 				//注文処理
+				boolean isOrdered = runOrderConfirmation(scanner, cartService, orderService);
+
+				if (isOrdered) {
+					return;
+				}
 			} else if (cartMenuNumber == 0) {
 				return;
 			} else {
@@ -255,5 +265,33 @@ public class Main {
 
 		System.out.println("商品をカートから削除しました。");
 		System.out.println();
+	}
+
+	private static boolean runOrderConfirmation(Scanner scanner, CartService cartService, OrderService orderService) {
+		Cart cart = cartService.getCart();
+
+		if (cart.getItems().isEmpty()) {
+			System.out.println("カートに商品がありません。");
+			System.out.println();
+			return false;
+		}
+
+		Menu.showOrderConfirmationMenu();
+		int selectedNum = scanner.nextInt();
+
+		while (true) {
+
+			if (selectedNum == 1) {
+				Order order = orderService.confirmOrder(cart);
+				orderService.showOrderComplete(order);
+				return true;
+			} else if (selectedNum == 0) {
+				return false;
+			} else {
+				System.out.println("0〜1の操作番号を入力してください。");
+				System.out.println();
+			}
+
+		}
 	}
 }
