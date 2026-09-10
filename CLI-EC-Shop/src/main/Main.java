@@ -151,30 +151,35 @@ public class Main {
 
 			productService.showSearchResults(searchResults);
 
-			// 商品IDを入力させ、商品詳細を表示させる				
-			Menu.showSearchResultSelectionPrompt();
-			int selectedProductId = InputUtil.readInt(scanner);
-			System.out.println();
-			// 入力された商品IDから商品を取得し、詳細を表示する
-			if (selectedProductId == -1) {
-				continue;
-			}
-
-			if (selectedProductId == 0) {
-				return;
-			}
-
-			Product selectedProduct = productService.findProductById(searchResults, selectedProductId);
-
-			if (selectedProduct == null) {
+			while (true) {
+				// 商品IDを入力させ、商品詳細を表示させる				
+				Menu.showSearchResultSelectionPrompt();
+				int selectedProductId = InputUtil.readInt(scanner);
 				System.out.println();
-				System.out.println("検索結果に該当する商品IDがありません。");
-				System.out.println();
+				// 入力された商品IDから商品を取得し、詳細を表示する
+				if (selectedProductId == -1) {
+					continue;
+				}
 
-				continue;
+				if (selectedProductId == 0) {
+					return;
+				}
+
+				Product selectedProduct = productService.findProductById(searchResults, selectedProductId);
+
+				if (selectedProduct == null) {
+					System.out.println();
+					System.out.println("検索結果に該当する商品IDがありません。");
+					System.out.println();
+
+					continue;
+				}
+
+				runProductDetail(scanner, productService, selectedProduct, cartService);
+
+				break;
 			}
 
-			runProductDetail(scanner, productService, selectedProduct, cartService);
 		}
 	}
 
