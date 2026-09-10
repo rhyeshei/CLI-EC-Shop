@@ -10,6 +10,7 @@ import model.Product;
 import service.CartService;
 import service.OrderService;
 import service.ProductService;
+import util.InputUtil;
 
 public class Main {
 	public static void main(String[] args) {
@@ -28,7 +29,7 @@ public class Main {
 			OrderService orderService) {
 		while (true) {
 			Menu.showMainMenu();
-			int mainMenuNumber = scanner.nextInt();
+			int mainMenuNumber = InputUtil.readInt(scanner);
 
 			if (mainMenuNumber == 1) {
 				runProductMenu(scanner, productService, cartService);
@@ -49,7 +50,7 @@ public class Main {
 	private static void runProductMenu(Scanner scanner, ProductService productService, CartService cartService) {
 		while (true) {
 			Menu.showProductMenu();
-			int productMenuNumber = scanner.nextInt();
+			int productMenuNumber = InputUtil.readInt(scanner);
 
 			if (productMenuNumber == 1) {
 				runProductList(scanner, productService, cartService);
@@ -72,13 +73,13 @@ public class Main {
 		//商品詳細メニューの繰り返し表示
 		while (true) {
 			Menu.showProductDetailMenu();
-			int detailMenuNum = scanner.nextInt();
+			int detailMenuNum = InputUtil.readInt(scanner);
 
 			if (detailMenuNum == 1) {
 				//購入数量を入力する処理				
 				while (true) {
 					Menu.showAddToCartPrompt();
-					int quantity = scanner.nextInt();
+					int quantity = InputUtil.readPositiveInt(scanner);
 
 					boolean isAdded = cartService.addToCart(selectedProduct, quantity);
 
@@ -107,7 +108,7 @@ public class Main {
 		productService.showProductList();
 		Menu.showProductSelectionPrompt();
 
-		int selectedProductId = scanner.nextInt();
+		int selectedProductId = InputUtil.readInt(scanner);
 
 		// 入力された商品IDから商品を取得し、詳細を表示する
 		if (selectedProductId == 0) {
@@ -128,55 +129,71 @@ public class Main {
 
 	// 商品名を受け取り、該当する商品を検索する
 	private static void runProductSearch(Scanner scanner, ProductService productService, CartService cartService) {
-		//検索プロンプトの表示		
-		Menu.showProductSearchPrompt();
-		//検索キー		
-		String keyword = scanner.next();
+		while (true) {
+			//検索プロンプトの表示		
+			Menu.showProductSearchPrompt();
+			//検索キー		
+			String keyword = InputUtil.readNonBlankString(scanner);
 
-		//検索処理		
-		if (keyword.equals("0")) {
-			return;
-		}
+			//検索処理		
+			if (keyword.equals("0")) {
+				return;
+			}
 
-		List<Product> searchResults = productService.searchProductsByName(keyword);
+			List<Product> searchResults = productService.searchProductsByName(keyword);
 
-		if (searchResults.isEmpty()) {
+			if (searchResults.isEmpty()) {
+				System.out.println("======検索結果=======");
+				System.out.println("該当する商品がありません");
+				continue;
+			}
 			System.out.println("======検索結果=======");
-			System.out.println("該当する商品がありません");
-			return;
-		}
-		System.out.println("======検索結果=======");
-		System.out.println(searchResults.size() + "件の商品");
-		System.out.println();
-		System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
-		System.out.println();
-		for (Product currentProduct : searchResults) {
-			System.out.printf("%-4s %-18s %-12s %-8s%n",
-					currentProduct.getProductId(),
-					currentProduct.getProductName(),
-					currentProduct.getPrice(),
-					currentProduct.getStock());
-		}
-		System.out.println();
-		// 商品IDを入力させ、商品詳細を表示させる				
-		Menu.showProductSelectionPrompt();
-		int selectedProductId = scanner.nextInt();
-		System.out.println();
-		// 入力された商品IDから商品を取得し、詳細を表示する
-		if (selectedProductId == 0) {
-			return;
-		}
-
-		Product selectedProduct = productService.findProductById(selectedProductId);
-
-		if (selectedProduct == null) {
+			System.out.println(searchResults.size() + "件の商品");
 			System.out.println();
-			System.out.println("商品が見つかりません");
+			System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
 			System.out.println();
-			return;
-		}
+			for (Product currentProduct : searchResults) {
+				System.out.printf("%-4s %-18s %-12s %-8s%n",
+						currentProduct.getProductId(),
+						currentProduct.getProductName(),
+						currentProduct.getPrice(),
+						currentProduct.getStock());
+			}
+			System.out.println();
+			// 商品IDを入力させ、商品詳細を表示させる				
+			Menu.showSearchResultSelectionPrompt();
+			int selectedProductId = InputUtil.readInt(scanner);
+			System.out.println();
+			// 入力された商品IDから商品を取得し、詳細を表示する
+			if (selectedProductId == -1) {
+				continue;
+			}
 
-		runProductDetail(scanner, productService, selectedProduct, cartService);
+			if (selectedProductId == 0) {
+				return;
+			}
+
+			Product selectedProduct = null;
+
+			for (Product currentProduct : searchResults) {
+
+				if (currentProduct.getProductId() == selectedProductId) {
+
+					selectedProduct = currentProduct;
+					break;
+				}
+			}
+
+			if (selectedProduct == null) {
+				System.out.println();
+				System.out.println("検索結果に該当する商品IDがありません。");
+				System.out.println();
+
+				continue;
+			}
+
+			runProductDetail(scanner, productService, selectedProduct, cartService);
+		}
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
@@ -184,7 +201,7 @@ public class Main {
 		while (true) {
 			cartService.showCartList();
 			Menu.showCartMenu();
-			int cartMenuNumber = scanner.nextInt();
+			int cartMenuNumber = InputUtil.readInt(scanner);
 
 			if (cartMenuNumber == 1) {
 				//数量変更処理
@@ -211,7 +228,7 @@ public class Main {
 
 	private static void runCartQuantityUpdate(Scanner scanner, CartService cartService) {
 		Menu.showCartQuantityUpdatePrompt();
-		int selectedProductId = scanner.nextInt();
+		int selectedProductId = InputUtil.readInt(scanner);
 
 		//カートメニューへ戻る
 		if (selectedProductId == 0) {
@@ -229,7 +246,7 @@ public class Main {
 
 		while (true) {
 			Menu.showNewQuantityPrompt();
-			int updateQuantity = scanner.nextInt();
+			int updateQuantity = InputUtil.readPositiveInt(scanner);
 
 			boolean isUpdate = cartService.updateCartItemQuantity(selectedCartItem, updateQuantity);
 
@@ -249,7 +266,7 @@ public class Main {
 
 	private static void runCartItemDelete(Scanner scanner, CartService cartService) {
 		Menu.showCartItemDeletePrompt();
-		int selectedProductId = scanner.nextInt();
+		int selectedProductId = InputUtil.readInt(scanner);
 
 		if (selectedProductId == 0) {
 			return;
@@ -277,7 +294,7 @@ public class Main {
 		}
 
 		Menu.showOrderConfirmationMenu();
-		int selectedNum = scanner.nextInt();
+		int selectedNum = InputUtil.readInt(scanner);
 
 		while (true) {
 

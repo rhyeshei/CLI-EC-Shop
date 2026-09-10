@@ -48,6 +48,15 @@ public class Menu {
 		System.out.print("商品名：");
 	}
 
+	public static void showSearchResultSelectionPrompt() {
+		System.out.println();
+		System.out.println("確認したい商品IDを入力してください。");
+		System.out.println("検索を続ける場合は、-1 を入力してください。");
+		System.out.println("商品メニューに戻る場合は、0 を入力してください。");
+		System.out.println("--------------------");
+		System.out.print("商品ID：");
+	}
+
 	public static void showAddToCartPrompt() {
 		System.out.println("購入数を入力してください");
 		System.out.println("--------------------");

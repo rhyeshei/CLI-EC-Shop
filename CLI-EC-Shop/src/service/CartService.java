@@ -14,6 +14,10 @@ public class CartService {
 
 	// カート追加処理	
 	public boolean addToCart(Product product, int quantity) {
+		if (quantity <= 0) {
+			return false;
+		}
+
 		//カート内に追加商品があるか確認＋ある場合の追加（すでに追加済＋今回追加分）
 		for (CartItem currentCartItem : cart.getItems()) {
 			if (currentCartItem.getProduct().getProductId() == product.getProductId()) {
@@ -93,6 +97,10 @@ public class CartService {
 
 	//数量変更メソッド
 	public boolean updateCartItemQuantity(CartItem cartItem, int newQuantity) {
+		if (newQuantity <= 0) {
+			return false;
+		}
+
 		if (newQuantity > cartItem.getProduct().getStock()) {
 			return false;
 		}
