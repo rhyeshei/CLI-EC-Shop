@@ -158,7 +158,7 @@ public class Main {
 				System.out.println();
 				// 入力された商品IDから商品を取得し、詳細を表示する
 				if (selectedProductId == -1) {
-					continue;
+					break;
 				}
 
 				if (selectedProductId == 0) {
