@@ -1,6 +1,7 @@
 package service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,13 +9,15 @@ import model.Cart;
 import model.CartItem;
 import model.Order;
 import model.Product;
+import util.ConsoleFormatter;
 
 public class OrderService {
-	private List<Order> orders = new ArrayList<>();
+	private static final DateTimeFormatter ORDER_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+	private final List<Order> orders = new ArrayList<>();
 	private int nextOrderId = 1;
 
 	public List<Order> getOrders() {
-		return orders;
+		return List.copyOf(orders);
 	}
 
 	public Order confirmOrder(Cart cart) {
@@ -35,7 +38,7 @@ public class OrderService {
 			orderItems.add(orderItem);
 
 			// 合計金額の計算			
-			totalPrice += currentCartItem.getProduct().getPrice() * currentCartItem.getQuantity();
+			totalPrice += currentCartItem.getSubtotal();
 
 			// 在庫数の更新			
 			Product currentProduct = currentCartItem.getProduct();
@@ -46,52 +49,51 @@ public class OrderService {
 		Order order = new Order(nextOrderId, LocalDateTime.now(), orderItems, totalPrice);
 
 		orders.add(order);
-		nextOrderId += 1;
+		nextOrderId++;
 		cart.getItems().clear();
 
 		return order;
 	}
 
 	public void showOrderComplete(Order order) {
-		System.out.println("====================");
-		System.out.println("　　　　注文完了　　　　");
-		System.out.println("====================");
+		System.out.println();
+		System.out.println("[ 注文完了 ]");
+		System.out.println();
 		System.out.println("注文を確定しました。");
 		System.out.println();
 
-		System.out.printf(
-				"%-8s %-30s %-12s%n",
-				"注文ID", "日時", "合計金額");
+		String formattedOrderDate = order.getOrderDate()
+				.format(ORDER_DATE_FORMATTER);
 
-		System.out.printf(
-				"%-8s %-30s %-12s%n",
-				order.getOrderId(),
-				order.getOrderDate(),
-				order.getTotalPrice() + "円");
+		System.out.println("注文ID　：" + order.getOrderId());
 
-		System.out.println("--------------------");
-		System.out.printf(
-				"%-4s %-18s %-12s %-8s %-8s%n",
-				"ID", "商品名", "価格", "数量", "小計");
+		System.out.println("注文日時：" + formattedOrderDate);
+
+		System.out.println();
+		System.out.println("[ 注文内容 ]");
+		System.out.println();
+
+		System.out.println(ConsoleFormatter.formatCartHeader());
 
 		for (CartItem currentCartItem : order.getItems()) {
-			int subtotal = currentCartItem.getProduct().getPrice()
-					* currentCartItem.getQuantity();
 
-			System.out.printf(
-					"%-4s %-18s %-12s %-8s %-8s%n",
-					currentCartItem.getProduct().getProductId(),
-					currentCartItem.getProduct().getProductName(),
-					currentCartItem.getProduct().getPrice(),
-					currentCartItem.getQuantity(),
-					subtotal);
+			Product product = currentCartItem.getProduct();
+
+			System.out.println(
+					ConsoleFormatter.formatCartRow(
+							product.getProductId(),
+							product.getProductName(),
+							product.getPrice(),
+							currentCartItem.getQuantity(),
+							currentCartItem.getSubtotal()));
 		}
 
-		System.out.println("--------------------");
-		System.out.println(
-				"合計金額：" + order.getTotalPrice() + "円");
-		System.out.println();
-		System.out.println();
+		System.out.println("-".repeat(70));
+
+		String formattedTotal = String.format("%,d円", order.getTotalPrice());
+
+		System.out.println("合計金額：" + formattedTotal);
+
 		System.out.println();
 
 	}

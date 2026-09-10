@@ -4,22 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.Product;
+import util.ConsoleFormatter;
 
 public class ProductService {
-	private List<Product> allProducts = new ArrayList<>();
+	private final List<Product> allProducts = new ArrayList<>();
 
-	public List<Product> getAllProducts() {
-		return allProducts;
-	}
-
-	public void setAllProducts(List<Product> allProducts) {
-		this.allProducts = allProducts;
+	private void showProductHeader() {
+		System.out.println(
+				ConsoleFormatter.padRight("ID", 6)
+						+ ConsoleFormatter.padRight("商品名", 24)
+						+ ConsoleFormatter.padCenter("価格", 21)
+						+ ConsoleFormatter.padCenter("在庫数", 8));
 	}
 
 	//商品リストへ商品を追加	
 	public ProductService() {
-		allProducts.add(new Product(1, "MacBook Air　M5", 184800, 10));
-		allProducts.add(new Product(2, "MacBook Pro　M5", 449800, 11));
+		allProducts.add(new Product(1, "MacBook Air M5", 184800, 10));
+		allProducts.add(new Product(2, "MacBook Pro M5", 449800, 11));
 		allProducts.add(new Product(3, "iPhone 17", 129800, 6));
 		allProducts.add(new Product(4, "iPhone Air", 177800, 8));
 		allProducts.add(new Product(5, "Magic Mouse", 10800, 7));
@@ -31,24 +32,33 @@ public class ProductService {
 
 	}
 
+	private void showProductRow(Product product) {
+		String formattedPrice = String.format("%,d円", product.getPrice());
+
+		System.out.println(
+				ConsoleFormatter.padRight(String.valueOf(product.getProductId()), 6)
+						+ ConsoleFormatter.padRight(product.getProductName(), 26)
+						+ ConsoleFormatter.padLeft(formattedPrice, 14)
+						+ ConsoleFormatter.padLeft(String.valueOf(product.getStock()), 8));
+	}
+
 	//商品一覧を表示させるメソッド	
 	public void showProductList() {
-		System.out.println("====================");
-		System.out.println("　　　　商品一覧　　　　");
-		System.out.println("====================");
-		System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
+		System.out.println();
+		System.out.println("[ 商品一覧 ]");
 		System.out.println();
 
-		for (Product product : allProducts) {
-			System.out.printf("%-4s %-18s %-12s %-8s%n",
-					product.getProductId(),
-					product.getProductName(),
-					product.getPrice(),
-					product.getStock());
-		}
+		showProductTable(allProducts);
 
+	}
+
+	//	検索結果を表示させるメソッド
+	public void showSearchResults(List<Product> searchResults) {
+		System.out.println();
+		System.out.println("[ 検索結果：" + searchResults.size() + "件 ]");
 		System.out.println();
 
+		showProductTable(searchResults);
 	}
 
 	//商品名検索のメソッド	
@@ -69,7 +79,12 @@ public class ProductService {
 	//商品詳細表示：商品IDから、商品を特定する
 	public Product findProductById(int productId) {
 
-		for (Product currentProduct : allProducts) {
+		return findProductById(allProducts, productId);
+	}
+
+	public Product findProductById(List<Product> products, int productId) {
+
+		for (Product currentProduct : products) {
 			if (currentProduct.getProductId() == productId) {
 				return currentProduct;
 			}
@@ -78,17 +93,26 @@ public class ProductService {
 	}
 
 	//商品詳細表示：特定した商品を表示させる
-	public void showProductDetail(Product selectProduct) {
-		System.out.println("商品詳細");
-		System.out.println("--------------------");
-		System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
+	public void showProductDetail(Product selectedProduct) {
 		System.out.println();
-		System.out.printf("%-4s %-18s %-12s %-8s%n",
-				selectProduct.getProductId(),
-				selectProduct.getProductName(),
-				selectProduct.getPrice(),
-				selectProduct.getStock());
+		System.out.println("[ 商品詳細 ]");
+		System.out.println();
+
+		showProductHeader();
+		showProductRow(selectedProduct);
+
 		System.out.println();
 		System.out.println();
 	}
+
+	private void showProductTable(List<Product> products) {
+		showProductHeader();
+
+		for (Product currentProduct : products) {
+			showProductRow(currentProduct);
+		}
+
+		System.out.println();
+	}
+
 }

@@ -13,15 +13,19 @@ import service.ProductService;
 import util.InputUtil;
 
 public class Main {
+	private static final int ORDER_CANCELED = -1;
+	private static final int CONTINUE_SHOPPING = 1;
+	private static final int EXIT_APPLICATION = 0;
+
 	public static void main(String[] args) {
-		Scanner scanner = new Scanner(System.in);
-		ProductService productService = new ProductService();
-		CartService cartService = new CartService();
-		OrderService orderService = new OrderService();
+		try (Scanner scanner = new Scanner(System.in)) {
+			ProductService productService = new ProductService();
+			CartService cartService = new CartService();
+			OrderService orderService = new OrderService();
 
-		runMainMenu(scanner, productService, cartService, orderService);
+			runMainMenu(scanner, productService, cartService, orderService);
 
-		scanner.close();
+		}
 	}
 
 	// メインメニューを繰り返し表示し、選択された画面へ遷移する	
@@ -34,7 +38,14 @@ public class Main {
 			if (mainMenuNumber == 1) {
 				runProductMenu(scanner, productService, cartService);
 			} else if (mainMenuNumber == 2) {
-				runCartMenu(scanner, cartService, orderService);
+				boolean shouldExit = runCartMenu(scanner, productService, cartService, orderService);
+
+				if (shouldExit) {
+					System.out.println(
+							"CLI EC Shopを終了します。");
+
+					return;
+				}
 			} else if (mainMenuNumber == 0) {
 				System.out.println("CLI EC Shopを終了します。");
 				return;
@@ -76,22 +87,9 @@ public class Main {
 			int detailMenuNum = InputUtil.readInt(scanner);
 
 			if (detailMenuNum == 1) {
-				//購入数量を入力する処理				
-				while (true) {
-					Menu.showAddToCartPrompt();
-					int quantity = InputUtil.readPositiveInt(scanner);
-
-					boolean isAdded = cartService.addToCart(selectedProduct, quantity);
-
-					if (!isAdded) {
-						System.out.println("在庫数が足りません。購入数を再度入力してください。");
-						System.out.println();
-					} else {
-						System.out.println("カートに" + selectedProduct.getProductName() + "を" + quantity + "個追加しました。");
-						System.out.println();
-						return;
-					}
-				}
+				//購入数量を入力する処理
+				runAddToCart(scanner, selectedProduct, cartService);
+				return;
 
 			} else if (detailMenuNum == 0) {
 				//商品メニューへ				
@@ -143,23 +141,16 @@ public class Main {
 			List<Product> searchResults = productService.searchProductsByName(keyword);
 
 			if (searchResults.isEmpty()) {
-				System.out.println("======検索結果=======");
-				System.out.println("該当する商品がありません");
+				System.out.println();
+				System.out.println("[ 検索結果：0件 ]");
+				System.out.println();
+				System.out.println("該当する商品がありません。");
+				System.out.println();
 				continue;
 			}
-			System.out.println("======検索結果=======");
-			System.out.println(searchResults.size() + "件の商品");
-			System.out.println();
-			System.out.printf("%-4s %-18s %-12s %-8s", "ID", "商品名", "価格", "在庫数");
-			System.out.println();
-			for (Product currentProduct : searchResults) {
-				System.out.printf("%-4s %-18s %-12s %-8s%n",
-						currentProduct.getProductId(),
-						currentProduct.getProductName(),
-						currentProduct.getPrice(),
-						currentProduct.getStock());
-			}
-			System.out.println();
+
+			productService.showSearchResults(searchResults);
+
 			// 商品IDを入力させ、商品詳細を表示させる				
 			Menu.showSearchResultSelectionPrompt();
 			int selectedProductId = InputUtil.readInt(scanner);
@@ -173,16 +164,7 @@ public class Main {
 				return;
 			}
 
-			Product selectedProduct = null;
-
-			for (Product currentProduct : searchResults) {
-
-				if (currentProduct.getProductId() == selectedProductId) {
-
-					selectedProduct = currentProduct;
-					break;
-				}
-			}
+			Product selectedProduct = productService.findProductById(searchResults, selectedProductId);
 
 			if (selectedProduct == null) {
 				System.out.println();
@@ -197,7 +179,8 @@ public class Main {
 	}
 
 	// カートメニューを繰り返し表示し、各カート操作へ遷移する
-	private static void runCartMenu(Scanner scanner, CartService cartService, OrderService orderService) {
+	private static boolean runCartMenu(Scanner scanner, ProductService productService, CartService cartService,
+			OrderService orderService) {
 		while (true) {
 			cartService.showCartList();
 			Menu.showCartMenu();
@@ -211,13 +194,18 @@ public class Main {
 				runCartItemDelete(scanner, cartService);
 			} else if (cartMenuNumber == 3) {
 				//注文処理
-				boolean isOrdered = runOrderConfirmation(scanner, cartService, orderService);
+				int orderResult = runOrderConfirmation(scanner, cartService, orderService);
 
-				if (isOrdered) {
-					return;
+				if (orderResult == CONTINUE_SHOPPING) {
+					runProductMenu(scanner, productService, cartService);
+					return false;
+				}
+
+				if (orderResult == EXIT_APPLICATION) {
+					return true;
 				}
 			} else if (cartMenuNumber == 0) {
-				return;
+				return false;
 			} else {
 				System.out.println("0〜3のメニュー番号を入力してください。");
 				System.out.println();
@@ -248,9 +236,9 @@ public class Main {
 			Menu.showNewQuantityPrompt();
 			int updateQuantity = InputUtil.readPositiveInt(scanner);
 
-			boolean isUpdate = cartService.updateCartItemQuantity(selectedCartItem, updateQuantity);
+			boolean isUpdated = cartService.updateCartItemQuantity(selectedCartItem, updateQuantity);
 
-			if (isUpdate == true) {
+			if (isUpdated) {
 				System.out.println("数量を変更しました。");
 				System.out.println();
 				return;
@@ -274,7 +262,7 @@ public class Main {
 
 		boolean isDeleted = cartService.removeCartItemByProductId(selectedProductId);
 
-		if (isDeleted == false) {
+		if (!isDeleted) {
 			System.out.println("カート内に該当する商品がありません");
 			System.out.println();
 			return;
@@ -284,31 +272,71 @@ public class Main {
 		System.out.println();
 	}
 
-	private static boolean runOrderConfirmation(Scanner scanner, CartService cartService, OrderService orderService) {
+	private static int runOrderConfirmation(Scanner scanner, CartService cartService, OrderService orderService) {
 		Cart cart = cartService.getCart();
 
 		if (cart.getItems().isEmpty()) {
 			System.out.println("カートに商品がありません。");
 			System.out.println();
-			return false;
+			return ORDER_CANCELED;
 		}
 
-		Menu.showOrderConfirmationMenu();
-		int selectedNum = InputUtil.readInt(scanner);
+		cartService.showOrderConfirmationList();
 
 		while (true) {
+			Menu.showOrderConfirmationMenu();
+			int selectedNum = InputUtil.readInt(scanner);
 
 			if (selectedNum == 1) {
 				Order order = orderService.confirmOrder(cart);
 				orderService.showOrderComplete(order);
-				return true;
+				// 注文完了後の選択
+				while (true) {
+					Menu.showAfterOrderMenu();
+
+					int afterOrderNum = InputUtil.readInt(scanner);
+
+					if (afterOrderNum == CONTINUE_SHOPPING) {
+						return CONTINUE_SHOPPING;
+
+					} else if (afterOrderNum == EXIT_APPLICATION) {
+
+						return EXIT_APPLICATION;
+
+					} else {
+						System.out.println("0〜1の操作番号を入力してください。");
+						System.out.println();
+					}
+				}
 			} else if (selectedNum == 0) {
-				return false;
+				return ORDER_CANCELED;
 			} else {
 				System.out.println("0〜1の操作番号を入力してください。");
 				System.out.println();
 			}
 
+		}
+	}
+
+	private static void runAddToCart(Scanner scanner, Product selectedProduct, CartService cartService) {
+
+		while (true) {
+			Menu.showAddToCartPrompt();
+
+			int quantity = InputUtil.readPositiveInt(scanner);
+
+			boolean isAdded = cartService.addToCart(selectedProduct, quantity);
+
+			if (isAdded) {
+				System.out.println("カートに　" + selectedProduct.getProductName() + "　を" + quantity + "個追加しました。");
+
+				System.out.println();
+				return;
+			}
+
+			System.out.println("在庫数が足りません。購入数を再度入力してください。");
+
+			System.out.println();
 		}
 	}
 }

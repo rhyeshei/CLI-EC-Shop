@@ -3,7 +3,10 @@ package util;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class InputUtil {
+public final class InputUtil {
+	private InputUtil() {
+
+	}
 
 	public static int readInt(Scanner scanner) {
 
@@ -28,6 +31,7 @@ public class InputUtil {
 				return inputNum;
 			}
 			System.out.println("1以上の整数を入力してください。");
+			System.out.println();
 		}
 	}
 

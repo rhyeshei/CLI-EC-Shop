@@ -1,7 +1,7 @@
 package model;
 
 public class CartItem {
-	private Product product;
+	private final Product product;
 	private int quantity;
 
 	public CartItem(Product product, int quantity) {
@@ -21,4 +21,7 @@ public class CartItem {
 		this.quantity = quantity;
 	}
 
+	public int getSubtotal() {
+		return product.getPrice() * quantity;
+	}
 }

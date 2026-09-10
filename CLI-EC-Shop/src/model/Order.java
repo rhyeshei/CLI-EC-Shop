@@ -4,15 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Order {
-	private int orderId;
-	private LocalDateTime orderDate;
-	private List<CartItem> items;
-	private int totalPrice;
+	private final int orderId;
+	private final LocalDateTime orderDate;
+	private final List<CartItem> items;
+	private final int totalPrice;
 
-	public Order(int orderId, LocalDateTime ordeDate, List<CartItem> items, int totalPrice) {
+	public Order(int orderId, LocalDateTime orderDate, List<CartItem> items, int totalPrice) {
 		this.orderId = orderId;
-		this.orderDate = ordeDate;
-		this.items = items;
+		this.orderDate = orderDate;
+		this.items = List.copyOf(items);
 		this.totalPrice = totalPrice;
 	}
 
