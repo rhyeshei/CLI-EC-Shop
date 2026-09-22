@@ -12,7 +12,7 @@ public class Order {
 	public Order(int orderId, LocalDateTime orderDate, List<CartItem> items, int totalPrice) {
 		this.orderId = orderId;
 		this.orderDate = orderDate;
-		this.items = List.copyOf(items);
+		this.items = items;
 		this.totalPrice = totalPrice;
 	}
 

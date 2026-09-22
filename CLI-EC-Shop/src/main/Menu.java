@@ -1,10 +1,13 @@
 package main;
 
+// final をつけることで継承を禁止
 public final class Menu {
 
+	// 他クラスでのインスタンス生成を禁止
 	private Menu() {
 	}
 
+	// 0. メインメニュー
 	public static void showMainMenu() {
 		System.out.println("====================");
 		System.out.println("　　CLI　EC　SHOP　　 ");
@@ -17,6 +20,7 @@ public final class Menu {
 		System.out.print("選択 > ");
 	}
 
+	// 1. 商品メニュー
 	public static void showProductMenu() {
 		System.out.println();
 		System.out.println("[ 商品メニュー ]");
@@ -28,6 +32,7 @@ public final class Menu {
 		System.out.print("選択 > ");
 	}
 
+	// 2. 商品ID入力プロンプト
 	public static void showProductSelectionPrompt() {
 		System.out.println();
 		System.out.println("確認したい商品IDを入力してください");
@@ -36,13 +41,7 @@ public final class Menu {
 		System.out.print("選択 > ");
 	}
 
-	public static void showProductDetailMenu() {
-		System.out.println("1. カートに追加する");
-		System.out.println("0. 商品メニューに戻る");
-		System.out.println("--------------------");
-		System.out.print("選択 > ");
-	}
-
+	// 3. 商品検索プロンプト
 	public static void showProductSearchPrompt() {
 		System.out.println();
 		System.out.println("検索したい商品名を入力してください。");
@@ -51,6 +50,7 @@ public final class Menu {
 		System.out.print("入力 > ");
 	}
 
+	// 4. 商品検索後の詳細表示プロンプト
 	public static void showSearchResultSelectionPrompt() {
 		System.out.println();
 		System.out.println("確認したい商品IDを入力してください。");
@@ -60,6 +60,15 @@ public final class Menu {
 		System.out.print("入力 > ");
 	}
 
+	// 5. 商品詳細メニュー
+	public static void showProductDetailMenu() {
+		System.out.println("1. カートに追加する");
+		System.out.println("0. 商品メニューに戻る");
+		System.out.println("--------------------");
+		System.out.print("選択 > ");
+	}
+
+	// 6. カート追加時の購入数量入力プロンプト
 	public static void showAddToCartPrompt() {
 		System.out.println();
 		System.out.println("購入数を入力してください");
@@ -67,6 +76,7 @@ public final class Menu {
 		System.out.print("入力 > ");
 	}
 
+	// 7. カートメニュー
 	public static void showCartMenu() {
 		System.out.println("1. 数量変更");
 		System.out.println("2. 商品削除");
@@ -76,6 +86,31 @@ public final class Menu {
 		System.out.print("選択 > ");
 	}
 
+	// 8. 数量を変更する商品IDの入力プロンプト
+	public static void showCartQuantityUpdatePrompt() {
+		System.out.println();
+		System.out.println("変更する商品IDを入力してください");
+		System.out.println("カートメニューに戻る場合は、0 を入力してください。");
+		System.out.println("--------------------");
+		System.out.print("選択 > ");
+	}
+
+	// 9. 変更後の数量入力プロンプト
+	public static void showNewQuantityPrompt() {
+		System.out.println("変更後の数量を入力してください。");
+		System.out.println("--------------------");
+		System.out.print("入力 > ");
+	}
+
+	// 10. 削除する商品IDの入力プロンプト
+	public static void showCartItemDeletePrompt() {
+		System.out.println("削除する商品IDを入力してください。");
+		System.out.println("カートメニューに戻る場合は、0 を入力してください。");
+		System.out.println("--------------------");
+		System.out.print("入力 > ");
+	}
+
+	// 11. 注文確認メニュー
 	public static void showOrderConfirmationMenu() {
 		System.out.println();
 		System.out.println("この内容で注文を確定しますか？");
@@ -85,33 +120,13 @@ public final class Menu {
 		System.out.print("選択 > ");
 	}
 
-	public static void showCartQuantityUpdatePrompt() {
-		System.out.println();
-		System.out.println("変更する商品IDを入力してください");
-		System.out.println("カートメニューに戻る場合は、0を入力してください。");
-		System.out.println("--------------------");
-		System.out.print("選択 > ");
-	}
-
-	public static void showNewQuantityPrompt() {
-		System.out.println("変更後の数量を入力してください。");
-		System.out.print("入力 > ");
-	}
-
-	public static void showCartItemDeletePrompt() {
-		System.out.println("削除する商品IDを入力してください。");
-		System.out.println("カートメニューに戻る場合は、0を入力してください。");
-		System.out.print("入力 > ");
-	}
-
+	// 12. 注文完了後メニュー
 	public static void showAfterOrderMenu() {
 		System.out.println("続けて操作を選択してください。");
-
 		System.out.println();
 		System.out.println("1. 買い物を続ける");
 		System.out.println("0. 終了する");
-		System.out.println();
+		System.out.println("--------------------");
 		System.out.print("選択 > ");
 	}
-
 }

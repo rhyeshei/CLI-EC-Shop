@@ -3,7 +3,6 @@ package main;
 import java.util.List;
 import java.util.Scanner;
 
-import model.Cart;
 import model.CartItem;
 import model.Order;
 import model.Product;
@@ -16,7 +15,6 @@ public class Main {
 	// 0. Main 処理	
 	public static void main(String[] args) {
 		// try-with-resources でScanner を自動的に閉じる
-		// tryブロック終了時にscanner.close()が実行される
 		try (Scanner scanner = new Scanner(System.in)) {
 			// 各Serviceクラスのインスタンスを生成
 			ProductService productService = new ProductService();
@@ -117,7 +115,7 @@ public class Main {
 			// 商品検索プロンプト
 			Menu.showProductSearchPrompt();
 			// 検索キーワードを取得
-			String keyword = InputUtil.readNonBlankString(scanner);
+			String keyword = InputUtil.readRequiredText(scanner);
 
 			if (keyword.equals("0")) {
 				// 商品メニューに戻る（入力される値が、0の場合）
@@ -239,7 +237,7 @@ public class Main {
 			cartService.showCartList();
 
 			// カートが空の場合、メインメニューへ戻る
-			if (cartService.getCart().getItems().isEmpty()) {
+			if (cartService.getCartItems().isEmpty()) {
 				System.out.println("カートに商品がありません。");
 				System.out.println("メインメニューへ戻ります。");
 				System.out.println();
@@ -271,7 +269,11 @@ public class Main {
 					// アプリケーション終了
 					return true;
 				}
-				// -1 の場合処理が戻り、カートメニュー再表示
+
+				if (orderResult == -1) {
+					// カートメニューを再表示
+					continue;
+				}
 
 			} else if (cartMenuNumber == 0) {
 				// メインメニューへ戻る
@@ -358,16 +360,6 @@ public class Main {
 	// 戻り値：0 = アプリを終了
 	// 戻り値：-1 = 注文せずカートメニューへ戻る
 	private static int runOrderConfirmation(Scanner scanner, CartService cartService, OrderService orderService) {
-		// 現在のカートを取得
-		Cart cart = cartService.getCart();
-
-		// カートが空の場合は注文せず、カートメニューへ戻る
-		if (cart.getItems().isEmpty()) {
-			System.out.println("カートに商品がありません。");
-			System.out.println();
-			return -1;
-		}
-
 		// カート内商品表示
 		cartService.showOrderConfirmationList();
 
@@ -378,7 +370,7 @@ public class Main {
 
 			if (selectedNum == 1) {
 				// 注文を確定し、作成された注文情報を取得
-				Order order = orderService.confirmOrder(cart);
+				Order order = orderService.confirmOrder(cartService.getCartItems());
 
 				// 注文確定→注文完了表示
 				orderService.showOrderComplete(order);
