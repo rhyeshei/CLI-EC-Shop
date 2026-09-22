@@ -26,52 +26,52 @@
 
 ## クラス構成・役割
 
-### `main`パッケージ
+### main package
 
-- `Main`
+- Main
   - アプリ全体の進行や画面遷移を制御
   - 各Serviceクラスのメソッドを呼び出す
-- `Menu`
+- Menu
   - コンソールに表示する各種メニューや入力案内を表示
 
-### `model`パッケージ
+### model package
 
-- `Product`
+- Product
   - 商品ID・商品名・価格・在庫数を保持
-- `CartItem`
+- CartItem
   - カートへ追加した商品（`Product`）と購入数量を保持
-- `Order`
+- Order
   - 注文ID・注文日時・注文商品（`List<CartItem>`）・合計金額を保持
 
-### `service`パッケージ
+### service package
 
-- `ProductService`
+- ProductService
   - 商品一覧表示・商品検索・商品取得を行う
-- `CartService`
+- CartService
   - カートへの追加・削除・数量変更・合計金額の計算を行う
-- `OrderService`
+- OrderService
   - 注文情報の作成・合計金額の計算・在庫更新を行う
 
-### `util`パッケージ
+### util package
 
-- `ConsoleFormatter`
+- ConsoleFormatter
   - 文字の表示幅を計算し、コンソール上の表を整形
-- `InputUtil`
+- InputUtil
   - 入力値を確認し、不正な入力の場合は再入力を求める
 
 ## データ設計
 
 ### データを表すクラス
 
-- `Product`
+- Product
   - 商品ID
   - 商品名
   - 価格
   - 在庫数
-- `CartItem`
+- CartItem
   - 商品情報（`Product`）
   - 購入数量
-- `Order`
+- Order
   - 注文ID
   - 注文日時
   - 注文商品（`List<CartItem>`）
@@ -79,19 +79,19 @@
 
 ### データをまとめて管理するクラス
 
-- `ProductService`
+- ProductService
   - `List<Product>`として商品一覧を保持
-- `CartService`
+- CartService
   - `List<CartItem>`としてカート内容を保持
 
 ## CRUDの対応
 
 | CRUD | 対応機能 |
 | --- | --- |
-| `Create（作成・登録）` | カート登録、注文情報作成 |
-| `Read（読み取り・取得）` | 商品一覧表示、商品検索、商品詳細表示、カート一覧表示 |
-| `Update（更新・変更）` | カート数量更新、注文確定時の在庫更新 |
-| `Delete（削除）` | カート商品削除 |
+| Create（作成・登録） | カート登録、注文情報作成 |
+| Read（読み取り・取得） | 商品一覧表示、商品検索、商品詳細表示、カート一覧表示 |
+| Update（更新・変更） | カート数量更新、注文確定時の在庫更新 |
+| Delete（削除） | カート商品削除 |
 
 ## 実行方法
 
